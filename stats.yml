@@ -1,0 +1,31 @@
+name: Update Stats
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # alle 10 Minuten (GitHub kann Läufe um einige Minuten verzögern)
+  workflow_dispatch: {}       # manuell startbar über den Actions-Tab
+
+concurrency:
+  group: stats
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: python stats_bot.py
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          GUILD_ID: ${{ vars.GUILD_ID }}
+          CH_MEMBERS: ${{ vars.CH_MEMBERS }}
+          CH_ONLINE: ${{ vars.CH_ONLINE }}
+          CH_FAMILY: ${{ vars.CH_FAMILY }}
+          CH_DRINKS: ${{ vars.CH_DRINKS }}
+          FAMILY_ROLE_IDS: ${{ vars.FAMILY_ROLE_IDS }}
+          DRINKS_RESET_LOCAL: ${{ vars.DRINKS_RESET_LOCAL }}
